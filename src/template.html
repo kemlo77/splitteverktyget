@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Splitteverktyget</title>
+    <meta name="author" content="Fredrik Kemling">
+    <meta name="description"
+        content="Ett testverktyg att använda för splitta rader i textfiler. Användaren väljer användningsfall och får sitt data splittat (enligt AF).">
+    <script type="text/javascript">
+
+    </script>
+</head>
+
+<body>
+    <div id="left">
+    </div>
+    <div id="center">
+        <h1>Splitteverktyget</h1>
+        <p>Skript som delar upp delar upp strängar i bitar enligt fördefinerade (olika) längder.
+            Kan hantera flera rader.</p><br>
+        <b id="useCaseRubrik">Fältlängder:</b><br>
+        <p id="useCaseBeskrivandeText">Klicka på den knapp till vänster som matchar ditt användningsfall</p>
+        <textarea id="fieldLengthInput" rows="3" cols="100"></textarea><br>
+        <b>Input:</b><br>
+        <textarea id="textinput" rows="20"></textarea><br>
+        Avgränsare: <input type="text" id="delimiterBox" size=1> (Anges om texten är komma-separerad (CSV) eller
+        annattecken)<br><br>
+        Transponera output: <input type="checkbox" id="transposeCheckBox" checked="true"><br><br>
+        <button id="splittaKnapp">Splitta</button>
+        <button id="rensaTraceKnapp">Rensa trace</button>
+        <br>
+
+
+    </div>
+    <div id="right">
+        Infotext...
+    </div>
+</body>
+</body>

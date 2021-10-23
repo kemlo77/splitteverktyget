@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Splitteverktyget</title>
+	<meta name="author" content="Fredrik Kemling">
+	<meta name="description"
+		content="Ett verktyg att använda för att splitta upp texter. Användaren väljer användningsfall och får sitt data splittat (enligt AF).">
+	<style>
+		body {
+			background-color: rgb(255, 255, 205);
+			font-family: Verdana, Arial, Sans-serif;
+			font-size: medium;
+		}
+
+		textarea {
+			background-color: white;
+			border-style: solid;
+			border-width: 1px;
+			border-color: black;
+			overflow: auto;
+			width: 100%;
+			margin-bottom: 7px;
+		}
+
+		button {
+			margin-bottom: 7px;
+			border: solid 1px black;
+			padding: 4px 6px;
+		}
+
+		button#sidebutton {
+			width: 100%;
+		}
+
+		table {
+			background-color: rgb(255, 255, 205);
+		}
+
+		table,
+		td,
+		th {
+			border: 1px solid black;
+			text-align: right;
+		}
+
+		th,
+		td {
+			padding: 2px 3px;
+		}
+
+		td#darker {}
+
+		td#wrongLength {}
+
+		td#rightLength {}
+
+		th {
+			text-align: left;
+		}
+
+		h1,
+		h4 {
+			margin: 0;
+		}
+
+		h4 {
+			margin-bottom: 15px;
+		}
+
+		p {
+			margin: 5px 0px;
+		}
+
+		div {
+			float: left;
+			margin: 10px;
+			border-style: none;
+			border-width: 0px;
+		}
+
+		#left {
+			width: 100px;
+		}
+
+		#center {
+			width: 40%;
+			border: 1px solid black;
+			padding: 15px;
+		}
+
+		#right {
+			width: auto;
+		}
+	</style>
+	<script type="text/javascript">
+		//här lägger man in definitioner på användningsfall
+		var useCaseArrays = [];
+		useCaseArrays.push(["Namn 1", "Beskrivning 1", "1,12,2,2,4,1,1,1,1,1,12,12"]);
+		useCaseArrays.push(["Namn 2", "Beskrivning 2", "1,12,2,2,4,1,1,1,1,1,12,12"]);
+
+
+
+		//skapar knappar på vänster sida när sidan laddats färdigt
+		window.onload = createButtons;
+		function createButtons() {
+			createHtmlButtons(useCaseArrays, "left");
+		}
+
+
+		//skapar ett antal buttons i html-format. Returnerar i form av en sträng
+		function createHtmlButtons(arrayOfArrays, divId) {
+			var leftDiv = document.getElementById(divId);
+			//lägger till knappar
+			for (y = 0; y < arrayOfArrays.length; y++) {
+				var buttonNode = document.createElement("button");
+				buttonNode.setAttribute("id", "sidebutton");
+				buttonNode.value = arrayOfArrays[y][0];
+				buttonNode.textContent = arrayOfArrays[y][0];
+				buttonNode.onclick = updateUseCaseInfoWithThisUC;
+				leftDiv.appendChild(buttonNode);
+			}
+		}
+
+
+		//matchar ett användningsfall (ex AF802) med ett sparat användningsfall. Uppdaterar info
+		function updateUseCaseInfoWithThisUC() {
+			var useCaseName = this.value;
+			for (t = 0; t < useCaseArrays.length; t++) {
+				if (useCaseName == useCaseArrays[t][0]) {
+					updateUseCaseInfo(useCaseArrays[t]);
+				}
+			}
+		}
+
+
+		//uppdaterar rubrik, beskrivning och "komma-sträng"-textboxen
+		function updateUseCaseInfo(useCaseArray) {
+			document.getElementById("useCaseRubrik").textContent = useCaseArray[0];
+			document.getElementById("useCaseBeskrivandeText").textContent = useCaseArray[1];
+			if (useCaseArray.length == 3) {
+				document.getElementById("fieldLengthInput").value = useCaseArray[2];
+			}
+		}
+
+
+		//Texten i boxen textinput bearbetas (splittas) givet dom längder som står i boxen "fieldLengthInput"
+		function delaUppText() {
+			var delimiterChar = document.getElementById("delimiterBox").value;
+
+			//dom fältlängder som står i textboxen "fieldLengthInput" används. (även om användaren angivit dom själv)
+			textInfieldLengthInput = document.getElementById("fieldLengthInput").value;
+			textLengthArray = textInfieldLengthInput.split(",");
+
+			//summerar värdena i komma-strängen
+			//funktion som används av metoden reduce()
+			//se https://www.w3schools.com/jsref/jsref_reduce.asp
+			//   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce?v=a
+			var kommaStringLength = textLengthArray.reduce(function (a, b) { return a + b * 1; }, 0);
+
+			//läser in texten i input-lådan och delar radvis
+			var inputText = document.getElementById("textinput").value;
+			var inputRowsArray = inputText.split("\n");
+
+			//delar upp varje sträng i dom givna längderna (resultatet blir en array of arrays)
+			var splittedInputRowsArraysArray = new Array();
+
+			//längden på varje sträng kontrolleras och diffen sparas i en array
+			var checkedLengthDiffArray = new Array();
+
+			//kolla om texten ska delas m.a.p nåt tecken. T.ex CSV filer m.a.p ","
+			if (delimiterChar == "") {
+				if (textInfieldLengthInput !== "") {
+					for (i = 0; i < inputRowsArray.length; i++) {
+						//kollar att det inte bara är en tom sträng
+						if (inputRowsArray[i] != "") {
+							//kollar längden på strängen jämfört med komma-strängens summa
+							var checkLengthDiff = inputRowsArray[i].length - kommaStringLength;
+							checkedLengthDiffArray.push(checkLengthDiff);
+							//sparar strängen
+							splittedInputRowsArraysArray.push(stringSplitter(inputRowsArray[i], textLengthArray));
+						}
+					}
+					//skriv ut resultatet som en <table>
+					removeChildNodes("right");
+					createHtmlTable(splittedInputRowsArraysArray, checkedLengthDiffArray, "right", true);
+				}
+				else { alert("Välj ett användningsfall på knapparna till vänster"); }
+			}
+			else {
+				for (i = 0; i < inputRowsArray.length; i++) {
+					//kollar att det inte bara är en tom sträng
+					if (inputRowsArray[i] != "") {
+						//sparar strängen
+						var splittedInputRowArray = inputRowsArray[i].split(delimiterChar);
+						splittedInputRowsArraysArray.push(splittedInputRowArray);
+						//kollar längden på strängen jämfört med komma-strängens summa
+						var numberOfDelimiterChars = splittedInputRowArray.length - 1;
+						var checkLengthDiff = 0;
+						//om det finns fältlängder (komma-värden) så kan man jämföra och se.
+						if (kommaStringLength != 0) {
+							checkLengthDiff = inputRowsArray[i].length - numberOfDelimiterChars - kommaStringLength;
+						}
+						checkedLengthDiffArray.push(checkLengthDiff);
+					}
+				}
+				//skriv ut resultatet som en <table>
+				removeChildNodes("right");
+				createHtmlTable(splittedInputRowsArraysArray, checkedLengthDiffArray, "right", false);
+			}
+
+
+
+		}
+
+
+		//raderar child nodes för ett element
+		//hittade denna funktionen på nätet nånstans...
+		function removeChildNodes(elementId) {
+			var myNode = document.getElementById(elementId);
+			while (myNode.firstChild) {
+				myNode.removeChild(myNode.firstChild);
+			}
+
+		}
+
+
+		//skapar en table under angivet element (en div?!)
+		function createHtmlTable(arrayOfArrays, checkedLengthDiffArray, divId, includeLengthDiff) {
+
+			var doTransposedTable = document.getElementById("transposeCheckBox").checked;
+
+
+			//hitta den array i arrayOfArrays som är längst
+			var largestArrayLength = 0;
+			for (z = 0; z < arrayOfArrays.length; z++) {
+				if (arrayOfArrays[z].length > largestArrayLength) {
+					largestArrayLength = arrayOfArrays[z].length;
+				}
+			}
+
+			//om lengthDiff ska visas behöver th-raden ha extra colspan
+			var extraColspan = 0;
+			if (includeLengthDiff) { extraColspan += 1; }
+
+
+			//skapar "table"-elementet
+			var rightDiv = document.getElementById(divId);
+			var theTableNode = document.createElement("table");
+			rightDiv.appendChild(theTableNode);
+
+			//skapar första raden med TH-element
+			var firstTrNode = document.createElement("tr");
+			theTableNode.appendChild(firstTrNode);
+			var newThNode = document.createElement("th");
+			newThNode.setAttribute("colspan", (doTransposedTable ? arrayOfArrays.length : largestArrayLength + extraColspan));
+			firstTrNode.appendChild(newThNode);
+			newThNode.innerText = "Output:";
+
+			if (doTransposedTable) {
+				//skapar andra raden med TD-element (feedback på längd)				
+				if (includeLengthDiff) {
+					var secondTrNode = document.createElement("tr");
+					theTableNode.appendChild(secondTrNode);
+					for (p = 0; p < checkedLengthDiffArray.length; p++) {
+						secondTrNode.appendChild(createLengthDiffTdNode(checkedLengthDiffArray[p]));
+					}
+				}
+
+				//skapar tredje raden med TD-element (radera-knappar)
+				var thirdTrNode = document.createElement("tr");
+				theTableNode.appendChild(thirdTrNode);
+				for (x = 0; x < arrayOfArrays.length; x++) {
+					thirdTrNode.appendChild(createDeleteTdNode());
+				}
+
+				//skapar rader med nya td-element
+				for (q = 0; q < largestArrayLength; q++) {
+					var newTrNode = document.createElement("tr");
+					theTableNode.appendChild(newTrNode);
+					for (z = 0; z < arrayOfArrays.length; z++) {
+						newTrNode.appendChild(createTdNode(arrayOfArrays[z][q], doTransposedTable));
+					}
+				}
+			}
+			else {
+				for (r = 0; r < arrayOfArrays.length; r++) {
+					var newTrNode = document.createElement("tr");
+					theTableNode.appendChild(newTrNode);
+
+					//lägger till längd-diff-td
+					if (includeLengthDiff) {
+						newTrNode.appendChild(createLengthDiffTdNode(checkedLengthDiffArray[r]));
+					}
+
+					//lägger in td-element med värden
+					for (t = 0; t < arrayOfArrays[r].length; t++) {
+						newTrNode.appendChild(createTdNode(arrayOfArrays[r][t]), doTransposedTable);
+					}
+				}
+			}
+		}
+
+		function createDeleteTdNode() {
+			var newTdNode = document.createElement("td");
+			newTdNode.innerText = "radera";
+			newTdNode.onclick = raderaKolumn;
+			return newTdNode;
+
+		}
+
+		function createLengthDiffTdNode(lengthDiff) {
+			var newTdNode = document.createElement("td");
+			if (lengthDiff != 0) {
+				newTdNode.innerText = Math.abs(lengthDiff) + (lengthDiff > 0 ? " lång" : " kort");
+				newTdNode.setAttribute("id", "wrongLength")
+			}
+			else {
+				newTdNode.innerText = "längd ok";
+				newTdNode.setAttribute("id", "rightLength")
+			}
+			return newTdNode;
+		}
+
+		function createTdNode(cellValue, tableIsTransposed) {
+			//regex för att kolla om värdet i cellen är typ 00000 eller +00000
+			var patt = /^\+?0*$/g;
+			var newTdNode = document.createElement("td");
+			newTdNode.innerText = String(cellValue);
+			if (tableIsTransposed) {
+				newTdNode.onclick = hittaLikaIRad;
+			}
+			else {
+				newTdNode.onclick = hittaLikaIKolumn;
+			}
+			if (!patt.test(cellValue)) {
+				newTdNode.setAttribute("id", "darker");
+			}
+			return newTdNode;
+		}
+
+
+		//om man klickar i en cell så körs denna funktion
+		//den kollar i genom andra td-celler på samma rad i table. Celler som har samma värde som den valda får blå bakgrund
+		//klickar man på en cell som redan har blå bakgrund så tas ändras hela raden till normal bakgrund igen
+		function hittaLikaIRad() {
+			var highlightColor = "powderblue";
+			var valdText = this.innerText;
+			var tdNodes = this.parentElement.getElementsByTagName("td");
+			if (this.style.backgroundColor == highlightColor) {
+				for (j = 0; j < tdNodes.length; j++) {
+					tdNodes[j].style.backgroundColor = "";
+				}
+			}
+			else {
+				for (i = 0; i < tdNodes.length; i++) {
+					if (tdNodes[i].innerText == valdText) {
+						tdNodes[i].style.backgroundColor = highlightColor;
+					}
+					else {
+						tdNodes[i].style.backgroundColor = "";
+					}
+				}
+			}
+		}
+
+		//om man klickar i en cell så körs denna funktion
+		//den kollar i genom andra td-celler på samma kolumn i table. Celler som har samma värde som den valda får blå bakgrund
+		//klickar man på en cell som redan har blå bakgrund så tas ändras hela kolumnen till normal bakgrund igen			
+		function hittaLikaIKolumn() {
+			var highlightColor = "powderblue";
+			var valdText = this.innerText;
+			var tdChildNumber = getIndex(this);
+			var trNodes = this.parentElement.parentElement.getElementsByTagName("tr");
+			if (this.style.backgroundColor == highlightColor) {
+				for (y = 1; y < trNodes.length; y++) {
+					trNodes[y].children[tdChildNumber].style.backgroundColor = "";
+				}
+			}
+			else {
+				for (y = 1; y < trNodes.length; y++) {
+					if (trNodes[y].children[tdChildNumber].innerText == valdText) {
+						trNodes[y].children[tdChildNumber].style.backgroundColor = highlightColor;
+					}
+					else {
+						trNodes[y].children[tdChildNumber].style.backgroundColor = "";
+					}
+				}
+			}
+		}
+
+
+		//raderar en kolumn.
+		function raderaKolumn() {
+			var tdChildNumber = getIndex(this);
+			var trNodes = this.parentElement.parentElement.getElementsByTagName("tr");
+			//hoppar över första TR eftersom den innehåller TH-elementet
+			for (y = 1; y < trNodes.length; y++) {
+				trNodes[y].removeChild(trNodes[y].children[tdChildNumber]);
+			}
+			//ändrar bredden på th-elementet (colspan)
+			var thElementet = trNodes[0].getElementsByTagName("th")[0];
+			thElementet.setAttribute("colspan", thElementet.getAttribute("colspan") - 1);
+		}
+
+
+		//returnerar ett elements index i förhållande till element på samma nivå (som har samma parent)
+		// tog lösning från https://www.webmasterworld.com/forum91/4633.htm
+		function getIndex(elm) {
+			var nodes = elm.parentNode.childNodes, node;
+			var i = count = 0;
+			while ((node = nodes.item(i++)) && node != elm)
+				if (node.nodeType == 1) {
+					count++;
+				}
+			return count;
+		}
+
+
+		//Splittar upp en sträng enligt längder givet i en array. Returnerar en array med delarna
+		function stringSplitter(dataString, partLengthArray) {
+			var infoArray = new Array();
+			var slicePosition = 0;
+			for (j = 0; j < partLengthArray.length; j++) {
+				var currentSlice = dataString.slice(slicePosition, slicePosition + partLengthArray[j] * 1);
+				infoArray.push(currentSlice);
+				slicePosition += partLengthArray[j] * 1;
+			}
+			return infoArray;
+		}
+
+
+		//Kollar i boxen för komma-värden och städar bort text/whitespace. Separerar nummer med ","
+		function cleanfieldLengthInput() {
+			var stringToClean = document.getElementById("fieldLengthInput").value;
+			//byter ut alla tecken mellan siffrorna mot ett ","
+			var regex1 = /\D+/g;
+			var cleanedString = stringToClean.replace(regex1, ",");
+			//rensar start och slut från eventuella ","
+			var regex2 = /,?([\d,]+\d),?$/g;
+			var result = regex2.exec(cleanedString);
+			var trimmedCleanedString = result[1];
+			document.getElementById("fieldLengthInput").value = trimmedCleanedString;
+		}
+
+
+		//när textboxen "fieldLengthInput" uppdaterats körs denna funktion
+		function fieldLengthInputChanged() {
+			cleanfieldLengthInput();
+			kommaStringChangedUpdateInfo(document.getElementById("fieldLengthInput").value);
+		}
+
+
+		//matchar ett användningsfall (ex AF802) med ett sparat användningsfall. Uppdaterar info
+		//om det inte matchar uppdateras info till "??"
+		function kommaStringChangedUpdateInfo(kommaString) {
+			for (t = 0; t < useCaseArrays.length; t++) {
+				if (kommaString == useCaseArrays[t][2]) {
+					updateUseCaseInfo([useCaseArrays[t][0], useCaseArrays[t][1]]);
+					break;
+				}
+				else {
+					updateUseCaseInfo(["AF???", "Okänt användningsfall"]);
+				}
+			}
+		}
+
+
+		//rensar upp det trace man får när testkörningen inte hittar förväntad sträng
+		function cleanTheTrace() {
+			var stringToClean = document.getElementById("textinput").value;
+			//byter ut futt och komma mot ny rad
+			var regex1 = /[',]/g;
+			var cleanedString = stringToClean.replace(regex1, "\n");
+			//tar bort alla rader efter "	at ..."
+			var regex2 = /\s+at\s+.+/g;
+			cleanedString = cleanedString.replace(regex2, "");
+			//Tar bort två ytterligare strängar
+			cleanedString = cleanedString.replace("java.lang.AssertionError: Raden ", "");
+			cleanedString = cleanedString.replace(" ska finnas i resultatet rader som finns ", "");
+			document.getElementById("textinput").value = cleanedString;
+		}
+
+
+	</script>
+</head>
+
+<body>
+	        <div id="left">
+		        </div>
+	        <div id="center">
+		            <h1>Splitteverktyget</h1>
+		            <p>Skript som delar upp delar upp strängar i bitar enligt fördefinerade (olika) längder.
+			            Kan hantera flera rader.</p><br>
+		            <b id="useCaseRubrik">Fältlängder:</b><br>
+		            <p id="useCaseBeskrivandeText">Klicka på den knapp till vänster som matchar ditt användningsfall</p>
+		            <textarea id="fieldLengthInput" rows="3" cols="100"
+			onChange="fieldLengthInputChanged();"></textarea><br>
+		            <b>Input:</b><br>
+		            <textarea id="textinput" rows="20"></textarea><br>
+		Avgränsare: <input type="text" id="delimiterBox" size=1> (Anges om texten är komma-separerad (CSV) eller annat
+		tecken)<br><br>
+		            Transponera output: <input type="checkbox" id="transposeCheckBox" checked="true"><br><br>
+		            <button onClick="delaUppText('')">Splitta</button>
+		            <button onClick="cleanTheTrace()">Rensa trace</button>
+		<br>
+
+		       
+	</div>
+	        <div id="right">
+		        Infotext...
+		        </div>
+</body>
+</body>
