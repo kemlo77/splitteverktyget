@@ -1,8 +1,10 @@
 import './style.css';
-import { TableView } from './TableView';
+import { TableView } from './view/TableView';
 import { UseCase } from './usecase';
 
 const useCaseArrays: UseCase[] = [];
+const theTableDiv: HTMLElement = document.getElementById('right');;
+const tableView: TableView = new TableView(theTableDiv);
 useCaseArrays.push({
     namn: 'Exempel 1',
     beskrivning: 'Beskrivning 1',
@@ -49,7 +51,7 @@ function getValueFromTextAreaElement(id: string): string {
 
 
 //Texten i boxen textinput bearbetas (splittas) givet dom längder som står i boxen "fieldLengthInput"
-function delaUppText(): void {
+function delaUppText(tableView: TableView): void {
 
     var delimiterChar: string = getValueFromInputElement('delimiterBox');
 
@@ -80,7 +82,7 @@ function delaUppText(): void {
                     rowLengthDiffs.push(rowString.length - expectedRowLength);
                     rowsOfSplitStrings.push(stringSplitter(rowString, desiredStringLengths));
                 });
-            new TableView().updateTableView(rowsOfSplitStrings, rowLengthDiffs);
+            tableView.updateTableView(rowsOfSplitStrings, rowLengthDiffs);
 
         }
         else { alert('Välj ett användningsfall på knapparna till vänster'); }
@@ -91,7 +93,7 @@ function delaUppText(): void {
                 rowsOfSplitStrings.push(rowString.split(delimiterChar));
             });
 
-        new TableView().updateTableView(rowsOfSplitStrings, rowLengthDiffs);
+        tableView.updateTableView(rowsOfSplitStrings, rowLengthDiffs);
     }
 
 }
@@ -130,7 +132,7 @@ function enterTestText(): void {
 }
 
 
-document.getElementById('splittaKnapp').addEventListener('click', () => delaUppText());
+document.getElementById('splittaKnapp').addEventListener('click', () => delaUppText(tableView));
 document.getElementById('fyllITestText').addEventListener('click', () => enterTestText());
 document.getElementById('fieldLengthInput').addEventListener('click', () => cleanfieldLengthInput());
 window.onload = (): void => createUseCaseButtons(useCaseArrays, 'left');
