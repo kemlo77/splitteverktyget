@@ -18,14 +18,29 @@
         <h1>Splitteverktyget</h1>
         <p>Skript som delar upp delar upp strängar i bitar enligt fördefinerade (olika) längder.
             Kan hantera flera rader.</p><br>
-        <b id="useCaseRubrik">Fältlängder:</b><br>
-        <p id="useCaseBeskrivandeText">Klicka på den knapp till vänster som matchar ditt användningsfall</p>
-        <textarea id="fieldLengthInput" rows="3" cols="100"></textarea><br>
+        <fieldset>
+            <legend>Select preferred way of splitting text</legend>
+              <input type="radio" id="lengthsAlternative" name="splittingType" value="HTML" checked>
+              <label for="html">By specifying lengths</label><br>
+              <input type="radio" id="delimeterAlternative" name="splittingType" value="CSS">
+              <label for="css">By delimeter character(s)</label><br><br>
+        </fieldset>
+
+        <fieldset>
+            <b id="useCaseRubrik">Fältlängder:</b><br>
+            <p id="useCaseBeskrivandeText">Klicka på den knapp till vänster som matchar ditt användningsfall</p>
+            <textarea id="fieldLengthInput" rows="3" cols="100"></textarea><br>
+        </fieldset>
+
+        <fieldset>
+            <b>Delimeter character(s)</b><br>
+            Avgränsare: <input type="text" id="delimiterBox" size=1><br>
+            (Anges om texten är komma-separerad (CSV) eller annat tecken)<br>
+        </fieldset><br>
+
         <b>Input:</b><br>
         <textarea id="textinput" rows="20"></textarea><br>
-        Avgränsare: <input type="text" id="delimiterBox" size=1> (Anges om texten är komma-separerad (CSV) eller
-        annattecken)<br><br>
-        Transponera output: <input type="checkbox" id="transposeCheckBox" checked="true"><br><br>
+
         <button id="splittaKnapp">Splitta</button>
         <button id="fyllITestText">Test text</button>
         <br>

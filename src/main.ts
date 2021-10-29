@@ -1,10 +1,13 @@
 import './style.css';
 import { TableView } from './view/TableView';
 import { UseCase } from './usecase';
+import { Model } from './model/Model';
 
 const useCaseArrays: UseCase[] = [];
 const theTableDiv: HTMLElement = document.getElementById('right');;
-const tableView: TableView = new TableView(theTableDiv);
+const model: Model = new Model();
+const tableView: TableView = new TableView(theTableDiv, model);
+
 useCaseArrays.push({
     namn: 'Exempel 1',
     beskrivning: 'Beskrivning 1',
@@ -49,69 +52,47 @@ function getValueFromTextAreaElement(id: string): string {
     return (document.getElementById(id) as HTMLTextAreaElement).value;
 }
 
-
-//Texten i boxen textinput bearbetas (splittas) givet dom längder som står i boxen "fieldLengthInput"
-function delaUppText(tableView: TableView): void {
-
-    var delimiterChar: string = getValueFromInputElement('delimiterBox');
-
-    //dom fältlängder som står i textboxen "fieldLengthInput" används. (även om användaren angivit dom själv)
-    const textInfieldLengthInput: string = getValueFromInputElement('fieldLengthInput');
-    const desiredStringLengths: number[] = textInfieldLengthInput.split(',').map(a => Number(a));
+function lengthSplittingChosen(): boolean {
+    return (document.getElementById('lengthsAlternative') as HTMLInputElement).checked;
+}
 
 
-    const expectedRowLength: number = desiredStringLengths
-        .map(a => Number(a))
-        .reduce((a, b) => a + b, 0);
+function delaUppText(tableView: TableView, model: Model): void {
 
-    //läser in texten i input-lådan och delar radvis
     var inputText: string = getValueFromTextAreaElement('textinput');
     var rowsOfStrings: string[] = inputText.split('\n').filter(rowString => rowString != '');
 
-    //delar upp varje sträng i dom givna längderna (resultatet blir en array of arrays)
     const rowsOfSplitStrings: string[][] = [];
-
-    //längden på varje sträng kontrolleras och diffen sparas i en array
     const rowLengthDiffs: number[] = [];
 
-    //kolla om texten ska delas m.a.p nåt tecken. T.ex CSV filer m.a.p ","
-    if (delimiterChar == '') {
-        if (textInfieldLengthInput !== '') {
-            rowsOfStrings
-                .forEach(rowString => {
-                    rowLengthDiffs.push(rowString.length - expectedRowLength);
-                    rowsOfSplitStrings.push(stringSplitter(rowString, desiredStringLengths));
-                });
-            tableView.updateTableView(rowsOfSplitStrings, rowLengthDiffs);
+    if (lengthSplittingChosen()) {
+        const textInfieldLengthInput: string = getValueFromInputElement('fieldLengthInput');
 
+
+        if (textInfieldLengthInput !== '') {
+            const desiredStringLengths: number[] = textInfieldLengthInput.split(',').map(a => Number(a));
+            model.splitUsingGivenLengths(rowsOfStrings, desiredStringLengths);
+            tableView.updateTableView();
         }
         else { alert('Välj ett användningsfall på knapparna till vänster'); }
     }
     else {
-        rowsOfStrings
-            .forEach(rowString => {
-                rowsOfSplitStrings.push(rowString.split(delimiterChar));
-            });
+        var delimiterChar: string = getValueFromInputElement('delimiterBox');
+        if (delimiterChar !== '') {
 
-        tableView.updateTableView(rowsOfSplitStrings, rowLengthDiffs);
+            model.splitUsingDelimeter(rowsOfStrings, delimiterChar);
+            tableView.updateTableView();
+        } else {
+            alert('Enter delimeter character(s)');
+        }
+
     }
 
 }
 
 
 
-function stringSplitter(inputString: string, partLengthArray: number[]): string[] {
-    var stringSlices: string[] = [];
-    var slicePosition: number = 0;
-    partLengthArray
-        .map(it => Number(it))
-        .forEach(sliceSize => {
-            var currentSlice: string = inputString.slice(slicePosition, slicePosition + sliceSize);
-            stringSlices.push(currentSlice);
-            slicePosition += sliceSize;
-        });
-    return stringSlices;
-}
+
 
 function cleanfieldLengthInput(): void {
     var stringToClean: string = getValueFromInputElement('fieldLengthInput');
@@ -132,7 +113,7 @@ function enterTestText(): void {
 }
 
 
-document.getElementById('splittaKnapp').addEventListener('click', () => delaUppText(tableView));
+document.getElementById('splittaKnapp').addEventListener('click', () => delaUppText(tableView, model));
 document.getElementById('fyllITestText').addEventListener('click', () => enterTestText());
 document.getElementById('fieldLengthInput').addEventListener('click', () => cleanfieldLengthInput());
 window.onload = (): void => createUseCaseButtons(useCaseArrays, 'left');

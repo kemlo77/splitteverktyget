@@ -1,46 +1,27 @@
 import { OriginalOrientationState } from './OriginalOrientationState';
 import { OrientationState } from './OrientationState';
 import { TransposedOrientationState } from './TransposedOrientationState';
+import { Model } from '../model/Model';
 
 export class TableView {
 
     private theTableDiv: HTMLElement;
-
+    private _model: Model;
     private orientationState: OrientationState;
 
-    constructor(element: HTMLElement) {
+    constructor(element: HTMLElement, model: Model) {
         this.theTableDiv = element;
-        //this.orientationState = new OriginalOrientationState();
+        this._model = model;
         this.orientationState = new TransposedOrientationState();
     }
 
-    updateTableView(rowsOfCellValues: string[][], checkedLengthDiffArray: number[]): void {
-
+    updateTableView(): void {
         this.orientationState.removeChildrenOfElement(this.theTableDiv);
-
-        this.theTableDiv.appendChild(this.createToggleOrientationButton());
-
-
-        const doTransposedTable: boolean = (document.getElementById('transposeCheckBox') as HTMLInputElement).checked;
-        let table: HTMLTableElement;
-
-        if (doTransposedTable) {
-            table = this.orientationState.createTable(rowsOfCellValues, checkedLengthDiffArray);
-        }
-        else {
-            table = this.orientationState.createTable(rowsOfCellValues, checkedLengthDiffArray);
-        }
+        const button: HTMLButtonElement = this.createToggleOrientationButton();
+        this.theTableDiv.appendChild(button);
+        const table: HTMLTableElement =
+            this.orientationState.createTable(this._model.rowsOfSplitStrings, this._model.rowLengthDiffs);
         this.theTableDiv.appendChild(table);
-
-
-    }
-
-    toggleOrientationState(): void {
-        if (this.orientationState instanceof OriginalOrientationState) {
-            this.orientationState = new TransposedOrientationState();
-        } else {
-            this.orientationState = new OriginalOrientationState();
-        }
     }
 
     createToggleOrientationButton(): HTMLButtonElement {
@@ -50,6 +31,15 @@ export class TableView {
             this.toggleOrientationState();
         });
         return button;
+    }
+
+    toggleOrientationState(): void {
+        if (this.orientationState instanceof OriginalOrientationState) {
+            this.orientationState = new TransposedOrientationState();
+        } else {
+            this.orientationState = new OriginalOrientationState();
+        }
+        this.updateTableView();
     }
 
 }
