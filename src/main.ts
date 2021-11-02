@@ -62,13 +62,8 @@ function delaUppText(tableView: TableView, model: Model): void {
     var inputText: string = getValueFromTextAreaElement('textinput');
     var rowsOfStrings: string[] = inputText.split('\n').filter(rowString => rowString != '');
 
-    const rowsOfSplitStrings: string[][] = [];
-    const rowLengthDiffs: number[] = [];
-
     if (lengthSplittingChosen()) {
         const textInfieldLengthInput: string = getValueFromInputElement('fieldLengthInput');
-
-
         if (textInfieldLengthInput !== '') {
             const desiredStringLengths: number[] = textInfieldLengthInput.split(',').map(a => Number(a));
             model.splitUsingGivenLengths(rowsOfStrings, desiredStringLengths);
@@ -79,15 +74,12 @@ function delaUppText(tableView: TableView, model: Model): void {
     else {
         var delimiterChar: string = getValueFromInputElement('delimiterBox');
         if (delimiterChar !== '') {
-
             model.splitUsingDelimeter(rowsOfStrings, delimiterChar);
             tableView.updateTableView();
         } else {
             alert('Enter delimeter character(s)');
         }
-
     }
-
 }
 
 

@@ -5,14 +5,14 @@
     "author": "Fredrik Kemling",
     "scripts": {
         "eslint": "eslint -c .eslintrc --ext .ts src/*",
-        "build:beforeTest": "tsc",
         "build:forDevServer": "webpack-dev-server --config webpack.dev.js",
         "build:forProd": "webpack --config webpack.prod.js",
         "cypress:open": "npx cypress open",
         "e2e": "npx cypress run",
         "test": "mocha --recursive",
+        "specificTest": "mocha test/**/model.spec.ts",
         "coverage": "nyc npm run test",
-        "specificTest": "nyc mocha test/**/Model.spec.ts",
+        "coverageSpecificTest": "nyc mocha test/**/model.spec.ts",
         "sonar": "node sonar-project.js"
     },
     "devDependencies": {
