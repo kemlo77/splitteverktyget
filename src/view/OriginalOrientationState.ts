@@ -28,8 +28,10 @@ export class OriginalOrientationState extends OrientationState {
     }
 
     private prependLengthDiffColumn(table: HTMLTableElement, lengthDiffs: number[]): void {
-        for (let rowNumber: number = 0; rowNumber < table.rows.length; rowNumber++) {
-            table.rows[rowNumber].prepend(this.createLengthDiffTdNode(lengthDiffs[rowNumber]));
+        if (lengthDiffs.length > 0) {
+            for (let rowNumber: number = 0; rowNumber < table.rows.length; rowNumber++) {
+                table.rows[rowNumber].prepend(this.createLengthDiffTdNode(lengthDiffs[rowNumber]));
+            }
         }
     }
 

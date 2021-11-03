@@ -30,9 +30,11 @@ export class TransposedOrientationState extends OrientationState {
     }
 
     private prependLengthDiffsRow(table: HTMLTableElement, lengthDiffs: number[]): void {
-        const diffCellsRow: HTMLTableRowElement = document.createElement('tr');
-        lengthDiffs.forEach(diffValue => diffCellsRow.appendChild(this.createLengthDiffTdNode(diffValue)));
-        table.prepend(diffCellsRow);
+        if (lengthDiffs.length > 0) {
+            const diffCellsRow: HTMLTableRowElement = document.createElement('tr');
+            lengthDiffs.forEach(diffValue => diffCellsRow.appendChild(this.createLengthDiffTdNode(diffValue)));
+            table.prepend(diffCellsRow);
+        }
     }
 
     private createDeleteColumnCell(): HTMLTableCellElement {
