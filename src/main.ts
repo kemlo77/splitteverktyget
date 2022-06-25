@@ -9,13 +9,13 @@ const model: Model = new Model();
 const tableView: TableView = new TableView(theTableDiv, model);
 
 useCaseArrays.push({
-    namn: 'Exempel 1',
-    beskrivning: 'Beskrivning 1',
+    namn: 'Example 1',
+    beskrivning: 'Description 1',
     delningslangder: [3, 4, 3, 4, 2, 3, 3, 4, 2]
 });
 useCaseArrays.push({
-    namn: 'Exempel 2',
-    beskrivning: 'Beskrivning 2',
+    namn: 'Example 2',
+    beskrivning: 'Description 2',
     delningslangder: [1, 12, 4, 1, 1, 12, 12, 12, 12, 12, 11, 11, 11, 2]
 });
 
@@ -82,6 +82,20 @@ function delaUppText(tableView: TableView, model: Model): void {
     }
 }
 
+function toggleInputChoice(event: MouseEvent): void {
+    const clickedRadioButton: HTMLInputElement = event.target as HTMLInputElement;
+    const lengthsFieldset: HTMLFieldSetElement = document.getElementById('fieldsetLengths') as HTMLFieldSetElement;
+    const delimeterFieldset: HTMLFieldSetElement = document.getElementById('fieldsetDelimeter') as HTMLFieldSetElement;
+    if (clickedRadioButton.id == 'lengthsAlternative') {
+        lengthsFieldset.disabled = false;
+        delimeterFieldset.disabled = true;
+    } else {
+        lengthsFieldset.disabled = true;
+        delimeterFieldset.disabled = false;
+    }
+
+    console.log(clickedRadioButton.id);
+}
 
 
 
@@ -94,8 +108,10 @@ function cleanfieldLengthInput(): void {
     //rensar start och slut från eventuella ","
     var regex2: RegExp = /,?([\d,]+\d),?$/g;
     var result: RegExpExecArray = regex2.exec(cleanedString);
-    var trimmedCleanedString: string = result[1];
-    setValueForInputElement('fieldLengthInput', trimmedCleanedString);
+    if (result) {
+        var trimmedCleanedString: string = result[1];
+        setValueForInputElement('fieldLengthInput', trimmedCleanedString);
+    }
 }
 
 function enterTestText(): void {
@@ -108,5 +124,8 @@ function enterTestText(): void {
 document.getElementById('splittaKnapp').addEventListener('click', () => delaUppText(tableView, model));
 document.getElementById('fyllITestText').addEventListener('click', () => enterTestText());
 document.getElementById('fieldLengthInput').addEventListener('click', () => cleanfieldLengthInput());
+document.getElementById('fieldLengthInput').addEventListener('blur', () => cleanfieldLengthInput());
+document.getElementById('lengthsAlternative').addEventListener('click', (event) => toggleInputChoice(event));
+document.getElementById('delimeterAlternative').addEventListener('click', (event) => toggleInputChoice(event));
 window.onload = (): void => createUseCaseButtons(useCaseArrays, 'left');
 

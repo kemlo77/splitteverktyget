@@ -39,7 +39,8 @@ export class TransposedOrientationState extends OrientationState {
 
     private createDeleteColumnCell(): HTMLTableCellElement {
         const newTdNode: HTMLTableCellElement = document.createElement('td');
-        newTdNode.innerText = 'radera';
+        newTdNode.innerText = 'erase';
+        newTdNode.setAttribute('id', 'erase');
         newTdNode.addEventListener('click', (event) => { this.eraseColumn(<HTMLTableCellElement>event.target); });
         return newTdNode;
     }

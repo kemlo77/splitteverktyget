@@ -32,7 +32,7 @@ table,
 td,
 th {
     border: 1px solid black;
-    text-align: right;
+    text-align: left;
 }
 
 th,
@@ -42,6 +42,10 @@ td {
 
 td#darker {
     background-color: rgb(254, 255, 153);
+}
+
+td#erase {
+    cursor: pointer;
 }
 
 td#wrongLength {

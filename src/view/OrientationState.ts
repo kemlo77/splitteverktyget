@@ -29,11 +29,11 @@ export abstract class OrientationState {
     protected createLengthDiffTdNode(lengthDiff: number): HTMLTableCellElement {
         const newTdNode: HTMLTableCellElement = document.createElement('td');
         if (lengthDiff != 0) {
-            newTdNode.innerText = Math.abs(lengthDiff) + (lengthDiff > 0 ? ' lång' : ' kort');
+            newTdNode.innerText = (lengthDiff > 0 ? 'lengthy by ' : 'short by ') + Math.abs(lengthDiff);
             newTdNode.setAttribute('id', 'wrongLength');
         }
         else {
-            newTdNode.innerText = 'längd ok';
+            newTdNode.innerText = 'length ok';
             newTdNode.setAttribute('id', 'rightLength');
         }
         return newTdNode;

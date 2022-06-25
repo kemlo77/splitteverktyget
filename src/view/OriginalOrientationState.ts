@@ -37,7 +37,8 @@ export class OriginalOrientationState extends OrientationState {
 
     private createDeleteRowCell(): HTMLTableCellElement {
         const newTdNode: HTMLTableCellElement = document.createElement('td');
-        newTdNode.innerText = 'radera';
+        newTdNode.innerText = 'erase';
+        newTdNode.setAttribute('id', 'erase');
         newTdNode.addEventListener('click', (event) => {
             this.eraseRow(<HTMLTableCellElement>event.target);
         });

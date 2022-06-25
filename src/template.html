@@ -15,34 +15,32 @@
     <div id="left">
     </div>
     <div id="center">
-        <h1>Splitteverktyget</h1>
-        <p>Skript som delar upp delar upp strängar i bitar enligt fördefinerade (olika) längder.
-            Kan hantera flera rader.</p><br>
+        <h1>Text splitting tool</h1>
+        <p>A script to split a text by delimeter or by fixed-width (fixed-length)</p><br>
         <fieldset>
             <legend>Select preferred way of splitting text</legend>
-              <input type="radio" id="lengthsAlternative" name="splittingType" value="HTML" checked>
-              <label for="html">By specifying lengths</label><br>
-              <input type="radio" id="delimeterAlternative" name="splittingType" value="CSS">
-              <label for="css">By delimeter character(s)</label><br><br>
+            <input type="radio" id="lengthsAlternative" name="splittingType" value="HTML" checked>
+            <label for="html">By specifying field lengths</label><br>
+            <input type="radio" id="delimeterAlternative" name="splittingType" value="CSS">
+            <label for="css">By delimeter character(s)</label><br><br>
         </fieldset>
 
-        <fieldset>
-            <b id="useCaseRubrik">Fältlängder:</b><br>
-            <p id="useCaseBeskrivandeText">Klicka på den knapp till vänster som matchar ditt användningsfall</p>
-            <textarea id="fieldLengthInput" rows="3" cols="100"></textarea><br>
+        <fieldset id="fieldsetLengths">
+            <b id="useCaseRubrik">Field lengths:</b><br>
+            <p id="useCaseBeskrivandeText">Enter field lengths or try one of the examples to the left.</p>
+            <input type="text" id="fieldLengthInput" size="40"></input><br>
         </fieldset>
 
-        <fieldset>
+        <fieldset id="fieldsetDelimeter" disabled>
             <b>Delimeter character(s)</b><br>
-            Avgränsare: <input type="text" id="delimiterBox" size=1><br>
-            (Anges om texten är komma-separerad (CSV) eller annat tecken)<br>
+            Delimeter: <input type="text" id="delimiterBox" size=1>
         </fieldset><br>
 
         <b>Input:</b><br>
         <textarea id="textinput" rows="20"></textarea><br>
 
-        <button id="splittaKnapp">Splitta</button>
-        <button id="fyllITestText">Test text</button>
+        <button id="splittaKnapp">Split the text</button>
+        <button id="fyllITestText">Example text</button>
         <br>
 
 
